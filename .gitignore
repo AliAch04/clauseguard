@@ -1,0 +1,15 @@
+# Node / Web
+node_modules/
+dist/
+.env
+.env.local
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/build/
+*.keystore
+
+# Firebase
+.firebase/
+firebase-debug.log
