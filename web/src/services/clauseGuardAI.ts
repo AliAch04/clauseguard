@@ -13,11 +13,9 @@ async function fileToGenerativePart(file: File): Promise<Part> {
   });
 
   return {
-    inlineData: {
-      data: base64,
-      mimeType: file.type,
-    },
-  };
+  type: "inlineData",
+  inlineData: { data: base64Data, mimeType: file.type },
+};
 }
 
 /**
@@ -43,7 +41,7 @@ Identify red flags (auto-renewals, hidden fees, IP transfer, liability waivers) 
   return {
     analysis: result.response.text(),
     // Returns "on_device" or "in_cloud" so your UI can display a privacy badge
-    source: result.inferenceSource ?? "unknown",
+    source: result.response.inferenceSource ?? "unknown",
   };
 }
 
