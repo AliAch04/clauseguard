@@ -1,14 +1,21 @@
 import ReactMarkdown from 'react-markdown';
-import { AlertTriangle, Scale, FileSearch } from 'lucide-react';
+import { AlertTriangle, Scale, FileSearch, Quote } from 'lucide-react';
 import { InferenceBadge } from './InferenceBadge';
+import type { ClauseAnalysis, RiskSeverity } from '../services/clauseGuardAI';
 
 interface ScanResultsProps {
-  analysis: string | null;
+  analysis: ClauseAnalysis | null;
   source: string | null;
   isLoading: boolean;
   error: string | null;
   onOpenNegotiate: () => void;
 }
+
+const RISK_LABELS: Record<RiskSeverity, string> = {
+  HIGH: 'High Risk',
+  MEDIUM: 'Medium Risk',
+  LOW: 'Low Risk',
+};
 
 export function ScanResults({
   analysis,
@@ -53,16 +60,50 @@ export function ScanResults({
     );
   }
 
+  const overallRisk = analysis.overallRisk || 'MEDIUM';
+
   return (
     <section className="card results-card">
       <div className="results-header">
-        <h2 className="card-title">Risk & Clause Audit</h2>
+        <div className="results-title-group">
+          <h2 className="card-title">Risk & Clause Audit</h2>
+          <span className={`risk-pill risk-${overallRisk.toLowerCase()}`}>
+            {RISK_LABELS[overallRisk]}
+          </span>
+        </div>
         {source && <InferenceBadge source={source} />}
       </div>
 
-      <div className="markdown-body">
-        <ReactMarkdown>{analysis}</ReactMarkdown>
+      <div className="summary-box markdown-body">
+        <ReactMarkdown>{analysis.summary}</ReactMarkdown>
       </div>
+
+      {analysis.redFlags && analysis.redFlags.length > 0 && (
+        <div className="redflags-list">
+          {analysis.redFlags.map((flag, idx) => {
+            const sev = flag.severity || 'MEDIUM';
+            return (
+              <article key={idx} className={`redflag-card border-${sev.toLowerCase()}`}>
+                <div className="redflag-header">
+                  <h3 className="redflag-title">{flag.title}</h3>
+                  <span className={`risk-pill risk-${sev.toLowerCase()}`}>
+                    {sev}
+                  </span>
+                </div>
+
+                {flag.clauseQuote && (
+                  <blockquote className="clause-quote">
+                    <Quote size={13} />
+                    <span>{flag.clauseQuote}</span>
+                  </blockquote>
+                )}
+
+                <p className="redflag-explanation">{flag.plainEnglish}</p>
+              </article>
+            );
+          })}
+        </div>
+      )}
 
       <div className="results-footer">
         <button type="button" className="btn-negotiate" onClick={onOpenNegotiate}>
