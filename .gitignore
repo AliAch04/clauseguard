@@ -9,6 +9,7 @@ android/.gradle/
 android/local.properties
 android/app/build/
 *.keystore
+android/app/google-services.json
 
 # Firebase
 .firebase/

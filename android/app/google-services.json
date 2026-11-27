@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "485978231222",
+    "project_id": "clauseguard-92d9f",
+    "storage_bucket": "clauseguard-92d9f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:485978231222:android:d2250dbfe8fdc32ff6b117",
+        "android_client_info": {
+          "package_name": "com.clauseguard.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAelNSzr939LU5rLOYR-IcldERo3pmHWbk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

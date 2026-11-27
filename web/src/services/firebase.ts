@@ -11,15 +11,13 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 
-// Enable App Check debug token automatically on localhost
 if (import.meta.env.DEV) {
-  (self as unknown as Record<string, unknown>).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: boolean }).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
 
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
   isTokenAutoRefreshEnabled: true,
 });
-
 // Initialize Firebase AI Logic with the Gemini Developer API backend
 export const ai = getAI(app, { backend: new GoogleAIBackend() });
