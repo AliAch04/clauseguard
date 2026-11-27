@@ -6,7 +6,7 @@ import {
 } from "firebase/ai";
 import { ai } from "./firebase";
 
-const CLOUD_MODEL = "gemini-2.5-flash";
+const CLOUD_MODEL = "gemini-3.8-flash";
 
 // --- Exported Types for your Colleague's React UI ---
 export type RiskSeverity = "HIGH" | "MEDIUM" | "LOW";
@@ -70,10 +70,8 @@ async function fileToGenerativePart(file: File): Promise<Part> {
   });
 
   return {
-    inlineData: {
-      data: base64,
-      mimeType: file.type,
-    },
+    type: "inlineData",
+    inlineData: { data: base64, mimeType: file.type },
   };
 }
 
@@ -141,7 +139,8 @@ Respond ONLY with valid JSON matching this exact structure:
 
   return {
     analysis: parseAnalysisJSON(rawText),
-    source: result.inferenceSource ?? "unknown",
+    // Returns "on_device" or "in_cloud" so your UI can display a privacy badge
+    source: result.response.inferenceSource ?? "unknown",
   };
 }
 
