@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ShieldCheck, Wifi, WifiOff } from 'lucide-react';
-import { scanContractClause } from './services/clauseGuardAI';
+import { scanContractClause, type ClauseAnalysis } from './services/clauseGuardAI';
 import { ClauseInput } from './components/ClauseInput';
 import { ScanResults } from './components/ScanResults';
 import { NegotiateModal } from './components/NegotiateModal';
@@ -9,7 +9,7 @@ import './index.css';
 export function App() {
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [analysis, setAnalysis] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<ClauseAnalysis | null>(null);
   const [source, setSource] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,15 +52,26 @@ export function App() {
     } catch (err) {
       setAnalysis(null);
       setSource(null);
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to analyze this clause. Please verify your connection or Chrome Gemini Nano setup.'
-      );
+      const raw = err instanceof Error ? err.message : '';
+      if (raw.includes('429')) {
+        setError('Daily free-tier AI quota reached. Please try again later.');
+      } else if (raw.includes('500') || raw.includes('503')) {
+        setError('Gemini Cloud is temporarily busy. Please retry in a few seconds.');
+      } else {
+        setError(
+          raw || 'Unable to analyze this clause. Please verify your connection or Chrome Gemini Nano setup.'
+        );
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
+  const fallbackAnalysisText = analysis
+    ? `${analysis.summary}\n\n${analysis.redFlags
+        .map((f) => `- [${f.severity}] ${f.title}: ${f.plainEnglish} ("${f.clauseQuote}")`)
+        .join('\n')}`
+    : '';
 
   return (
     <div className="app-shell">
@@ -105,7 +116,7 @@ export function App() {
         isOpen={isNegotiateOpen}
         onClose={() => setIsNegotiateOpen(false)}
         originalClauseText={text}
-        fallbackAnalysis={analysis || ''}
+        fallbackAnalysis={fallbackAnalysisText}
       />
     </div>
   );
